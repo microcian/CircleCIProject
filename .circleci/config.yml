@@ -6,26 +6,35 @@ jobs:
       - image: circleci/android:api-25-alpha
     environment:
       JVM_OPTS: -Xmx3200m
-	TERM: dumb
+      TERM: dumb
     steps:
       - checkout
       - restore_cache:
-keys:
-          - v1-dependencies-{{ checksum "build.gradle" }}-{{ checksum "app/build.gradle" }}
+      keys:
+      - v1-dependencies-{{ checksum "build.gradle" }}-{{ checksum "app/build.gradle" }}
           # fallback to using the latest cache if no exact match is found
-- v1-dependencies-
+	  - v1-dependencies-
 #      - run:
 #         name: Chmod permissions #if permission for Gradlew Dependencies fail, use this.
 #         command: sudo chmod +x ./gradlew
-      - run:
-gradle dependencies
+      - run: gradle dependencies
           #name: Download Dependencies
           #command: ./gradlew androidDependencies
       - save_cache:
           paths:
             - ~/.gradle
-- ~/.m2
           key: v1-dependencies-{{ checksum "build.gradle" }}-{{ checksum  "app/build.gradle" }}
+	  - run: gradle build -x test 
+      - run: gradle test
+      - run: gradle shadowJar
+      - run: java -cp build/libs/CircleCIProject-all.jar CircleCIProject.Main
+      - store_test_results:
+          path: build/reports
+      - store_artifacts:
+          path: build/reports
+      - store_artifacts:
+path: build/libs/CircleCIProject-all.jar
+
       - run:
           name: Run Tests
           command: ./gradlew lint test
