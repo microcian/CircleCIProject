@@ -5,7 +5,7 @@
 version: 2
 jobs:
   build:
-    working_directory: ~/code
+    working_directory: ~/repo
     docker:
       - image: circleci/android:api-27-node8-alpha
     environment:
@@ -17,9 +17,9 @@ jobs:
       - run:
           name: Chmod permissions #if permission for Gradlew Dependencies fail, use this.
           command: sudo chmod +x ./gradlew
-      #- run:
-       #   name: Approve license for build tools
-          #command: (echo y; echo y; echo y; echo y; echo y; echo y) | $ANDROID_HOME/tools/bin/sdkmanager --licenses
+      - run:
+          name: Approve license for build tools
+          command: (echo y; echo y; echo y; echo y; echo y; echo y) | $ANDROID_HOME/tools/bin/sdkmanager --licenses
 
       - run:
           name: Download Dependencies
@@ -27,10 +27,10 @@ jobs:
       - run:
           name: Download Dependencies
           command: ./gradlew androidDependencies
-      #- save_cache:
-          #paths:
-           # - ~/.gradle
-       #   key: jars-{{ checksum "build.gradle" }}-{{ checksum  "app/build.gradle" }}
+      - save_cache:
+          paths:
+            - ~/.gradle
+          key: jars-{{ checksum "build.gradle" }}-{{ checksum  "app/build.gradle" }}
       - run:
           name: Run Tests
           command: ./gradlew lint test
