@@ -13,9 +13,6 @@ bin/
 gen/
 out/
 
-# Library
-kiosk/build/
-
 # Gradle files
 .gradle/
 gradle/
